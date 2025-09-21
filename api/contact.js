@@ -1,104 +1,132 @@
-const nodemailer = require('nodemailer');
+import React, { useState } from "react";
 
-export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+export default function ContactForm() {
+  const [formData, setFormData] = useState({
+    from_name: '',
+    from_email: '',
+    title: '',
+    phone: '',
+    time: '',
+    message: ''
+  });
+  const [isSent, setIsSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
+  const sendEmail = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const { from_name, from_email, title, phone, time, message } = req.body;
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    // Validation
-    if (!from_name || !from_email || !title || !message) {
-      return res.status(400).json({ error: 'Required fields are missing' });
-    }
-
-    // Create transporter
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+      if (!response.ok) {
+        throw new Error('Failed to send message');
       }
-    });
 
-    // Email content
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: process.env.RECEIVER_EMAIL,
-      subject: `New Contact Form: ${title}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333; border-bottom: 2px solid #000; padding-bottom: 10px;">
-            New Contact Form Submission
-          </h2>
-          
-          <div style="margin: 20px 0;">
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5; font-weight: bold;">Name:</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${from_name}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5; font-weight: bold;">Email:</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${from_email}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5; font-weight: bold;">Phone:</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${phone}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5; font-weight: bold;">Best Time:</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${time}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd; background: #f5f5f5; font-weight: bold;">Subject:</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">${title}</td>
-              </tr>
-            </table>
-          </div>
-          
-          <div style="margin: 20px 0;">
-            <h3 style="color: #333;">Message:</h3>
-            <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid #000; margin: 10px 0;">
-              ${message}
-            </div>
-          </div>
-          
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px;">
-            <p>This email was sent from your website contact form.</p>
-            <p>Timestamp: ${new Date().toLocaleString()}</p>
-          </div>
+      setIsSent(true);
+      setFormData({
+        from_name: '',
+        from_email: '',
+        title: '',
+        phone: '',
+        time: '',
+        message: ''
+      });
+    } catch (error) {
+      alert("❌ Failed to send: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      {!isSent ? (
+        <div className="space-y-5">
+          <input
+            type="text"
+            name="from_name"
+            placeholder="Your Name"
+            value={formData.from_name}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-black"
+          />
+          <input
+            type="email"
+            name="from_email"
+            placeholder="Your Email"
+            value={formData.from_email}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-black"
+          />
+          <input
+            type="text"
+            name="title"
+            placeholder="Subject"
+            value={formData.title}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-black"
+          />
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Your Contact Number"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-black"
+          />
+          <input
+            type="text"
+            name="time"
+            placeholder="Best Time to Contact"
+            value={formData.time}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-black"
+          />
+          <textarea
+            name="message"
+            placeholder="Your Message"
+            rows="4"
+            value={formData.message}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-black resize-none"
+          />
+          <button
+            type="button"
+            onClick={sendEmail}
+            disabled={loading}
+            className="w-full bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Sending..." : "Send Message"}
+          </button>
         </div>
-      `,
-      replyTo: from_email
-    };
-
-    await transporter.sendMail(mailOptions);
-    
-    console.log(`✅ Contact form submitted by ${from_name} (${from_email})`);
-    
-    res.status(200).json({ 
-      success: true, 
-      message: 'Email sent successfully' 
-    });
-
-  } catch (error) {
-    console.error('❌ Error sending email:', error);
-    res.status(500).json({ 
-      error: 'Failed to send email',
-      message: error.message 
-    });
-  }
+      ) : (
+        <div className="text-center py-10">
+          <h3 className="text-2xl font-semibold text-black mb-3">
+            ✅ Thank You!
+          </h3>
+          <p className="text-gray-600">We will contact you shortly.</p>
+        </div>
+      )}
+    </div>
+  );
 }
