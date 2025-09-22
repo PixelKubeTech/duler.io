@@ -5,12 +5,14 @@ import PixWebSection from './components/PixWebSection';
 import PixMobSection from './components/PixMobSection';
 import PixRoomFeatures from './components/PixRoomFeatures';
 import ContactForm from './components/ContactForm';
+import dulerVideo from './assets/duler-video.mp4';
 
 const DulerLandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('pixroom');
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   // This function closes the features modal and opens the form modal.
   const handleOpenFormFromFeatures = () => {
@@ -37,12 +39,12 @@ const DulerLandingPage = () => {
             <div className="hidden lg:flex items-center space-x-8">
               <a href="#home" className="text-gray-600 hover:text-black transition-colors duration-300 font-medium">Home</a>
               <a href="#contact" className="text-gray-600 hover:text-black transition-colors duration-300 font-medium">Contact</a>
-              <button 
+              {/* <button 
                 onClick={() => setIsFormOpen(true)}
                 className="bg-black text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 Get started
-              </button>
+              </button> */}
             </div>
 
             {/* Mobile menu button */}
@@ -62,12 +64,12 @@ const DulerLandingPage = () => {
               <div className="flex flex-col space-y-4">
                 <a href="#home" className="text-gray-600 hover:text-black transition-colors font-medium py-2">Home</a>
                 <a href="#contact" className="text-gray-600 hover:text-black transition-colors font-medium py-2">Contact</a>
-                <button 
+                {/* <button 
                   onClick={() => setIsFormOpen(true)}
                   className="bg-black text-white px-8 py-3 rounded-full font-semibold mt-4 hover:bg-gray-800"
                 >
                   Get started
-                </button>
+                </button> */}
               </div>
             </div>
           )}
@@ -95,17 +97,20 @@ const DulerLandingPage = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-              <button className="group bg-black text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
+              <button 
+                onClick={() => setIsVideoOpen(true)}
+                className="group bg-black text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center"
+              >
                 <Play className="w-5 h-5 mr-2" />
                 Watch demo
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button 
+              {/* <button 
                 onClick={() => setIsFormOpen(true)}
                 className="border-2 border-gray-300 text-black px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all duration-300 backdrop-blur-sm"
               >
                 Get started
-              </button>
+              </button> */}
             </div>
 
             {/* Explore Features Button */}
@@ -227,6 +232,67 @@ const DulerLandingPage = () => {
         </div>
       </footer>
 
+      {/* Video Player Modal */}
+      {isVideoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-black rounded-2xl shadow-2xl w-full max-w-4xl mx-4 relative">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-6 border-b border-gray-800">
+              <h2 className="text-xl font-semibold text-white">DULER Demo</h2>
+              <button 
+                onClick={() => setIsVideoOpen(false)} 
+                className="text-gray-400 hover:text-white transition-colors p-1"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            {/* Video Container */}
+            <div className="relative aspect-video">
+              <video 
+                className="w-full h-full rounded-b-2xl focus:outline-none"
+                controls
+                autoPlay
+                preload="auto"
+                controlsList="nodownload nofullscreen noremoteplayback"
+                disablePictureInPicture
+                style={{
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none',
+                  userSelect: 'none'
+                }}
+                onContextMenu={(e) => e.preventDefault()}
+                onLoadStart={() => {
+                  const loadingEl = document.getElementById('video-loading');
+                  if (loadingEl) loadingEl.style.display = 'flex';
+                }}
+                onCanPlay={() => {
+                  const loadingEl = document.getElementById('video-loading');
+                  if (loadingEl) loadingEl.style.display = 'none';
+                }}
+              >
+                {/* Your DULER video */}
+                <source src={dulerVideo} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              
+              {/* Loading overlay */}
+              <div 
+                className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-b-2xl pointer-events-none" 
+                id="video-loading"
+                style={{ display: 'none' }}
+              >
+                <div className="text-white text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
+                  <p className="text-sm">Loading DULER demo...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* PixRoom Features Modal */}
       <PixRoomFeatures 
         isOpen={isFeaturesOpen} 
@@ -238,14 +304,14 @@ const DulerLandingPage = () => {
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 relative">
-            <button 
+            {/* <button 
               onClick={() => setIsFormOpen(false)} 
               className="absolute top-4 right-4 text-gray-400 hover:text-black transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
             <h2 className="text-2xl font-bold mb-6 text-black">Get started</h2>
-            <ContactForm />
+            <ContactForm /> */}
           </div>
         </div>
       )}
