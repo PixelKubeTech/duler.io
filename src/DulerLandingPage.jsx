@@ -249,33 +249,26 @@ const DulerLandingPage = () => {
             
             {/* Video Container */}
             <div className="relative aspect-video">
-              <video 
-                className="w-full h-full rounded-b-2xl focus:outline-none"
-                controls
-                autoPlay
-                preload="auto"
-                controlsList="nodownload nofullscreen noremoteplayback"
-                disablePictureInPicture
-                style={{
-                  WebkitUserSelect: 'none',
-                  MozUserSelect: 'none',
-                  msUserSelect: 'none',
-                  userSelect: 'none'
-                }}
-                onContextMenu={(e) => e.preventDefault()}
-                onLoadStart={() => {
-                  const loadingEl = document.getElementById('video-loading');
-                  if (loadingEl) loadingEl.style.display = 'flex';
-                }}
-                onCanPlay={() => {
-                  const loadingEl = document.getElementById('video-loading');
-                  if (loadingEl) loadingEl.style.display = 'none';
-                }}
-              >
-                {/* Your DULER video */}
-                <source src={dulerVideo} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+              <video
+  className="w-full h-full rounded-b-2xl object-cover focus:outline-none"
+  controls
+  playsInline
+  muted={false} // keep muted={true} if you want autoplay
+  preload="auto"
+  controlsList="nodownload noremoteplayback"
+  disablePictureInPicture
+  style={{
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
+    msUserSelect: 'none',
+    userSelect: 'none'
+  }}
+  onContextMenu={(e) => e.preventDefault()}
+>
+  <source src={dulerVideo} type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
               
               {/* Loading overlay */}
               <div 
